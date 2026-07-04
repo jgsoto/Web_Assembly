@@ -1,27 +1,191 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebAssembly Calculator</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .calculator {
+            width: 420px;
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.15);
+        }
+
+        h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f1f1f1;
+            border-radius: 5px;
+        }
+
+        .result h3,
+        .result p {
+            margin: 8px 0;
+        }
+    </style>
+</head>
 
 <body>
 
-    <h2>WebAssembly Demo</h2>
+<div class="calculator">
 
-    <script>
-        async function run() {
+    <h2>🧮 WebAssembly Calculator</h2>
 
-            const response = await fetch("build/release.wasm");
+    <label>Number A</label>
+    <input
+        type="number"
+        id="num1"
+        value="10">
 
-            const bytes = await response.arrayBuffer();
+    <label>Number B</label>
+    <input
+        type="number"
+        id="num2"
+        value="20">
 
-            const wasm = await WebAssembly.instantiate(bytes);
+    <label>Operation</label>
 
-            const result = wasm.instance.exports.add(10, 20);
+    <select id="operation">
+        <option value="add">Addition (+)</option>
+        <option value="subtract">Subtraction (-)</option>
+        <option value="multiply">Multiplication (×)</option>
+        <option value="divide">Division (÷)</option>
+        <option value="power">Power (a^b)</option>
+        <option value="factorial">Factorial (A!)</option>
+    </select>
 
-            document.body.innerHTML +=
-                "<h3>10 + 20 = " + result + "</h3>";
-        }
+    <button onclick="calculate()">
+        Calculate
+    </button>
 
-        run();
-    </script>
+    <div class="result">
+
+        <h3 id="result">
+            Result:
+        </h3>
+
+        <p id="time">
+            Execution time:
+        </p>
+
+    </div>
+
+</div>
+
+<script>
+
+let wasm;
+
+async function init() {
+
+    const response = await fetch("build/release.wasm");
+
+    const bytes = await response.arrayBuffer();
+
+    const module = await WebAssembly.instantiate(bytes);
+
+    wasm = module.instance.exports;
+
+    console.log(Object.keys(wasm));
+
+}
+
+async function calculate() {
+
+    const a = parseInt(document.getElementById("num1").value);
+
+    const b = parseInt(document.getElementById("num2").value);
+
+    const operation = document.getElementById("operation").value;
+
+    let result;
+
+    const start = performance.now();
+
+    switch (operation) {
+
+        case "add":
+            result = wasm.add(a, b);
+            break;
+
+        case "subtract":
+            result = wasm.subtract(a, b);
+            break;
+
+        case "multiply":
+            result = wasm.multiply(a, b);
+            break;
+
+        case "divide":
+            result = wasm.divide(a, b);
+            break;
+
+        case "power":
+            result = wasm.power(a, b);
+            break;
+
+        case "factorial":
+            result = wasm.factorial(a);
+            break;
+
+    }
+
+    const end = performance.now();
+
+    document.getElementById("result").innerHTML =
+        "<strong>Result:</strong> " + result;
+
+    document.getElementById("time").innerHTML =
+        "<strong>Execution time:</strong> " +
+        (end - start).toFixed(5) +
+        " ms";
+
+}
+
+init();
+
+</script>
 
 </body>
 
