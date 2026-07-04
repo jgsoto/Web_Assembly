@@ -127,12 +127,6 @@ Example using **http-server**:
 npx http-server
 ```
 
-Or using Python:
-
-```bash
-python -m http.server
-```
-
 Then open the browser at:
 
 ```
@@ -189,9 +183,3 @@ This project demonstrates:
 - How computation can be delegated to WebAssembly while JavaScript handles the user interface.
 
 Although the implemented operations are simple, the same architecture is commonly used in high-performance applications such as image processing, video editing, scientific computing, cryptography, game engines, and artificial intelligence.
-
----
-
-## License
-
-This project is intended for educational and demonstration purposes.
